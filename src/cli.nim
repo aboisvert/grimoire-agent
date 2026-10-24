@@ -129,7 +129,7 @@ proc runCli*(args: seq[string]) =
         raise fail("Unknown argument: " & rest[i])
       inc i
     if cmdStart < 0 or cmdStart >= rest.len:
-      raise fail("Usage: grim-agent run --env NAME=op://ref ... -- COMMAND...")
+      raise fail("Usage: grim-agent run --env NAME=grim://ref|op://ref ... -- COMMAND...")
     let code = runAssignments(envs, decodeTrailingArguments(rest[cmdStart .. ^1]))
     quit(code)
   of "env":
@@ -138,7 +138,7 @@ proc runCli*(args: seq[string]) =
     case rest[1]
     of "write":
       if rest.len < 4:
-        raise fail("Usage: grim-agent env write FILE NAME=op://...")
+        raise fail("Usage: grim-agent env write FILE NAME=grim://ref|op://ref ...")
       var assigns: seq[Assignment] = @[]
       for a in rest[3 .. ^1]:
         assigns.add parseAssignment(a)

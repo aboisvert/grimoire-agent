@@ -1,6 +1,6 @@
 # grim-agent usage
 
-`grim-agent` is a CLI for finding, creating, and using secrets through [grimoire](https://github.com/)’s `grim` binary (1Password-compatible `op` surface). By default it works with **references** (`op://…`) and JSON receipts—not plaintext secrets.
+`grim-agent` is a CLI for finding, creating, and using secrets through [grimoire](https://github.com/)’s `grim` binary (1Password-compatible `op` surface). By default it works with **references** (`grim://…` or `op://…`) and JSON receipts—not plaintext secrets.
 
 Build:
 
@@ -52,20 +52,23 @@ Except for `doctor`, every command resolves credentials once at startup:
 
 ## Secret references
 
-Assignments and env templates use **1Password secret references**:
+Assignments and env templates use **grimoire secret references**. The value side must start with `grim://` or `op://` (both are accepted by `grim`):
 
-```text
-op://VaultOrVaultId/ItemTitleOrItemId/field
-```
+| Scheme | Form |
+|--------|------|
+| `op://` | `op://VaultOrVaultId/ItemTitleOrItemId/field` — 1Password-style field path |
+| `grim://` | `grim://vault/secret` or `grim://vault/secret/value` — native grimoire vault + secret title |
 
 Examples:
 
 ```text
 OPENAI_API_KEY=op://Automation/OpenAI API Key/credential
-DB_PASSWORD=op://Work/Production DB/password
+DB_PASSWORD=grim://Work/Production DB/value
 ```
 
-`grim-agent run` and `grim-agent env write` require the **value** side to start with `op://`. Environment variable names must look like shell identifiers: `[A-Za-z_][A-Za-z0-9_]*`.
+`find` and `create` usually return `op://` refs from the 1Password-compatible item API; hand-authored templates and direct `grim` usage may use `grim://` instead.
+
+Environment variable names must look like shell identifiers: `[A-Za-z_][A-Za-z0-9_]*`.
 
 ---
 
@@ -155,7 +158,7 @@ grim-agent read REFERENCE
 
 | Argument | Description |
 |----------|-------------|
-| `REFERENCE` | Full `op://…` path. |
+| `REFERENCE` | Full `grim://…` or `op://…` path. |
 
 **Stdout:** raw secret bytes (no JSON wrapper). **Stderr:** none on success.
 
@@ -163,6 +166,7 @@ grim-agent read REFERENCE
 
 ```bash
 grim-agent read "op://Automation/OpenAI API Key/credential"
+grim-agent read "grim://Automation/OpenAI API Key/value"
 ```
 
 ---
@@ -172,12 +176,12 @@ grim-agent read "op://Automation/OpenAI API Key/credential"
 Sets environment variables to secret references, then runs a child through `grim run` (references resolved inside the child). The child process receives **plaintext** values.
 
 ```text
-grim-agent run --env NAME=op://ref [--env NAME=op://ref ...] -- COMMAND [ARGS ...]
+grim-agent run --env NAME=REF [--env NAME=REF ...] -- COMMAND [ARGS ...]
 ```
 
 | Flag | Required | Description |
 |------|----------|-------------|
-| `--env` | Yes (≥1) | `VAR=op://…` assignment; repeat for multiple vars. |
+| `--env` | Yes (≥1) | `VAR=grim://…` or `VAR=op://…` assignment; repeat for multiple vars. |
 | `--` | Yes | Separates `grim-agent` flags from the command to execute. |
 | `COMMAND` | Yes | Executable and arguments. Arguments after `--` are passed through unchanged (including flags like `--verbose`). |
 
@@ -192,15 +196,15 @@ grim-agent run --env "API_KEY=op://Work/Service/credential" -- mytool --flag val
 
 ---
 
-### `env` — template files with `op://` placeholders
+### `env` — template files with secret-reference placeholders
 
 #### `env write` — create or overwrite a reference template
 
 ```text
-grim-agent env write FILE NAME=op://ref [NAME=op://ref ...]
+grim-agent env write FILE NAME=REF [NAME=REF ...]
 ```
 
-Writes `NAME=op://…` lines (one per assignment) plus a trailing newline. **Stderr:** `Wrote N secret references to FILE`.
+Writes `NAME=grim://…` or `NAME=op://…` lines (one per assignment) plus a trailing newline. **Stderr:** `Wrote N secret references to FILE`.
 
 **Example:**
 
@@ -210,7 +214,7 @@ grim-agent env write .env.tpl "OPENAI_API_KEY=op://Automation/OpenAI API Key/cre
 
 #### `env resolve` — materialize plaintext `.env`
 
-Reads a template (from `env write` or hand-authored). Lines that are comments, blank, non-`op://` literals, or `export VAR=op://…` are handled; `op://` lines are resolved in **one** batched `grim` call.
+Reads a template (from `env write` or hand-authored). Lines that are comments, blank, non-reference literals, or `export VAR=grim://…` / `export VAR=op://…` are handled; reference lines are resolved in **one** batched `grim` call.
 
 ```text
 grim-agent env resolve FILE (--output PATH | --in-place)
@@ -413,7 +417,7 @@ grim-agent doctor
 
 ## Security notes
 
-- **Default posture:** use `find`, `inventory`, and `audit` for discovery; pass `op://` refs into `run` / `env run` instead of `read` or `env resolve`.
+- **Default posture:** use `find`, `inventory`, and `audit` for discovery; pass `grim://` or `op://` refs into `run` / `env run` instead of `read` or `env resolve`.
 - **Plaintext on disk:** `env resolve` and `--in-place` create files with real secrets (`chmod 600` on Unix). Prefer `env run` when possible.
 - **Failed writes:** if `create`, `password --apply`, or `service-account setup` reports unverified state, run `find` or inspect 1Password before retrying—retries can duplicate items or leave ambiguous state.
 - **Child processes:** `run` and `env run` expose secrets to the invoked program; only run trusted commands.

@@ -9,7 +9,7 @@ description: Use for passwords, API keys, tokens, credentials, and secrets—fin
 
 ## Rules
 
-- Never print, log, summarize, or repeat secret values. Pass `op://` references around instead.
+- Never print, log, summarize, or repeat secret values. Pass `grim://` or `op://` references around instead.
 - Batch work into as few `grim` calls as possible: many queries in one `find`, many references in one `env run`.
 - Never run `grim whoami` or other preflights. Run the operation you need.
 - Never retry a write that failed or reported "unverified". Run `find` first.
@@ -27,10 +27,12 @@ Matches are `{ ref, title, kind }` with optional `queries`. Misses return `sugge
 
 ```bash
 grim-agent run --env "OPENAI_API_KEY=op://Automation/OpenAI API Key/credential" -- bun run dev
+grim-agent run --env "API_KEY=grim://Automation/OpenAI API Key/value" -- bun run dev
 grim-agent env write .env.tpl "OPENAI_API_KEY=op://Automation/OpenAI API Key/credential"
 grim-agent env run .env.tpl -- bun run dev
 grim-agent env resolve .env.tpl --output .env
 grim-agent read "op://Automation/OpenAI API Key/credential"
+grim-agent read "grim://Automation/OpenAI API Key/value"
 ```
 
 Prefer `env run` over resolving to disk. The child process receives plaintext; treat it as trusted.

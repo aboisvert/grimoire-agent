@@ -16,16 +16,20 @@ proc validEnvName(name: string): bool =
       return false
   true
 
+proc isSecretReference*(reference: string): bool =
+  reference.startsWith("op://") or reference.startsWith("grim://")
+
 proc parseAssignment*(assignment: string): Assignment =
   let eq = assignment.find('=')
   if eq < 1:
-    raise newException(ValueError, "Expected NAME=op://reference, received: " & assignment)
+    raise newException(
+      ValueError, "Expected NAME=grim://reference or NAME=op://reference, received: " & assignment)
   let name = assignment[0 ..< eq]
   let reference = assignment[eq + 1 .. ^1]
   if not validEnvName(name):
     raise newException(ValueError, "Invalid environment variable name: " & name)
-  if not reference.startsWith("op://"):
-    raise newException(ValueError, "Secret reference must start with op://: " & name)
+  if not isSecretReference(reference):
+    raise newException(ValueError, "Secret reference must start with grim:// or op://: " & name)
   Assignment(name: name, reference: reference)
 
 proc unquote*(value: string): string =
@@ -62,7 +66,7 @@ proc parseEnv*(content: string): seq[EnvLine] =
       continue
     let name = assignment[0 ..< eq].strip()
     let reference = unquote(assignment[eq + 1 .. ^1].strip())
-    if validEnvName(name) and reference.startsWith("op://"):
+    if validEnvName(name) and isSecretReference(reference):
       result.add EnvLine(kind: elReference, name: name, reference: reference)
     else:
       result.add EnvLine(kind: elLiteral, literal: original)

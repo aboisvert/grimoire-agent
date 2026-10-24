@@ -1,6 +1,6 @@
 # grimoire-agent
 
-`grim-agent` is a small CLI for AI agents: find credentials, inject `op://` references into commands and env files, create API credentials, and manage a local service-account token—without printing secrets by default.
+`grim-agent` is a small CLI for AI agents: find credentials, inject `grim://` or `op://` references into commands and env files, create API credentials, and manage a local service-account token—without printing secrets by default.
 
 It wraps `grim` from the **grimoire** repo (for example `~/nim/grimoire`; build with `nim c -o:grim src/grim.nim`). `grim` implements the `op`-compatible command lines this tool expects.
 
