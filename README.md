@@ -4,6 +4,27 @@
 
 It wraps `grim` from the [**grimoire**](https://github.com/aboisvert/grimoire) project. `grim` implements the 1Password `op`-compatible command lines this tool expects.
 
+## Typical use
+
+Store real secrets in your grimoire vault. In your project, keep a `.env` file that names those secrets with **`grim://`** references—not plaintext values. The file tells your app *which* secret each variable needs; grimoire still holds the actual value.
+
+```dotenv
+# .env — safe to treat as a template (no real secrets in the file)
+API_TOKEN=grim://my-vault/my-secret
+```
+
+When you run a program that reads the environment (a dev server, a deploy script, a one-off CLI), use **`env run`** so `grim-agent` resolves the references and starts the command with the real values injected. Nothing is written to a resolved `.env` on disk unless you ask for that separately.
+
+```bash
+grim-agent env run .env -- other-command
+```
+
+Everything after `--` is the command to run. `other-command` (and its children) see `API_TOKEN` set to the value from vault `my-vault`, item `my-secret`. `grim-agent` itself does not print the secret to your terminal.
+
+You need `grim` on your `PATH` (or set `GRIM_BIN`) and a working grimoire session—desktop sign-in or a service account. See [Configuration](#configuration) below.
+
+More detail: `USAGE.md` and `grim-agent env run --help`.
+
 ## Build
 
 ```bash
