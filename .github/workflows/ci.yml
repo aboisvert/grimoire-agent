@@ -11,7 +11,7 @@ jobs:
     container:
       image: nimlang/nim:2.2.12
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Cache Nimble packages
         uses: actions/cache@v6
