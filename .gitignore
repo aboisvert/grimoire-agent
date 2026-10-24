@@ -1,0 +1,15 @@
+/grim-agent
+/bin/
+/nimbledeps/
+*.exe
+*.o
+*.obj
+.cursor/
+
+# Extensionless files (compiled binaries) under src/ and tests/
+/src/**
+!/src/**/
+!/src/**/*.*
+/tests/**
+!/tests/**/
+!/tests/**/*.*
