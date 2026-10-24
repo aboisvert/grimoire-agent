@@ -1,1 +1,1 @@
-const grimAgentVersion* = "0.1.0"
+const grimAgentVersion* = "0.1.1"

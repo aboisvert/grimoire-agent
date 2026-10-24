@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.1.0"
+version       = "0.1.1"
 author        = "Alex Boisvert"
 description   = "1Password-style agent CLI over grim (grimoire)"
 license       = "MIT"
