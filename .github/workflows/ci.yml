@@ -2,21 +2,33 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
 
 jobs:
   test:
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    container:
+      image: nimlang/nim:2.2.12
     steps:
+      # Only grimoireagent.nimble is needed to resolve and cache Nimble deps.
       - uses: actions/checkout@v4
-      - uses: jiro4989/setup-nim-action@v2
         with:
-          nim-version: "2.2.12"
-      - name: Test
-        run: |
-          nim c --path:src -o:grim-agent src/grim_agent.nim
-          nim c -r --path:src --path:tests tests/all_tests.nim
+          sparse-checkout: grimoireagent.nimble
+          sparse-checkout-cone-mode: false
+
+      - name: Cache Nimble packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nimble
+          key: nimble-${{ hashFiles('grimoireagent.nimble') }}
+          restore-keys: |
+            nimble-
+
+      - name: Install dependencies
+        run: nimble install -y --depsOnly
+
+      - uses: actions/checkout@v4
+
+      - name: Run tests
+        run: nimble test
