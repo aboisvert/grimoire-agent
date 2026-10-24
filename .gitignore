@@ -1,4 +1,5 @@
 /grim-agent
+/dist/
 /bin/
 /nimbledeps/
 *.exe

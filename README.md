@@ -10,6 +10,16 @@ It wraps `grim` from the **grimoire** repo (for example `~/nim/grimoire`; build 
 nim c --path:src -o:grim-agent src/grim_agent.nim
 ```
 
+## Release
+
+From a clean `main` at `origin/main`, with `nim`, `docker`, and `gh` installed:
+
+```bash
+just release
+```
+
+This runs tests, builds macOS arm64 and Linux amd64 binaries into `dist/`, tags `v` plus the version from `grimoireagent.nimble`, publishes a GitHub release with `SHA256SUMS`, then bumps the patch version on `main` for the next development cycle.
+
 ## Test
 
 ```bash
