@@ -32,3 +32,11 @@ GRIM_E2E=1 GRIM_BIN=~/nim/grimoire/grim nim c -r --path:src --path:tests tests/e
 ## Commands
 
 See `skills/grim-agent/SKILL.md` for agent-oriented usage, or run `grim-agent --help`.
+
+Install the Cursor skill (symlink by default):
+
+```bash
+chmod +x scripts/install-skill.sh
+./scripts/install-skill.sh user      # ~/.cursor/skills/grim-agent
+./scripts/install-skill.sh project   # .cursor/skills/grim-agent in this repo
+```
