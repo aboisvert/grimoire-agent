@@ -11,11 +11,7 @@ jobs:
     container:
       image: nimlang/nim:2.2.12
     steps:
-      # Only grimoireagent.nimble is needed to resolve and cache Nimble deps.
       - uses: actions/checkout@v4
-        with:
-          sparse-checkout: grimoireagent.nimble
-          sparse-checkout-cone-mode: false
 
       - name: Cache Nimble packages
         uses: actions/cache@v4
@@ -27,8 +23,6 @@ jobs:
 
       - name: Install dependencies
         run: nimble install -y --depsOnly
-
-      - uses: actions/checkout@v4
 
       - name: Run tests
         run: nimble test
