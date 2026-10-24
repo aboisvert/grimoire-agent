@@ -6,6 +6,7 @@ description   = "1Password-style agent CLI over grim (grimoire)"
 license       = "MIT"
 srcDir        = "src"
 bin           = @["grim_agent"]
+namedBin      = {"grim_agent": "grim-agent"}.toTable
 
 requires "nim >= 2.2.0"
 task test, "Run unit and integration tests":
