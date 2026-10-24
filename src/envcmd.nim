@@ -117,7 +117,6 @@ proc readMany*(references: seq[string]): seq[string] =
   var extra = initTable[string, string]()
   for i, r in references:
     extra["GRIM_AGENT_SECRET_" & $i] = r
-  let bin = grimBin()
   let agent = getAppFilename()
   let runOut = grimOp(
     @["run", "--no-masking", "--", agent, "--dump-resolved", $references.len],

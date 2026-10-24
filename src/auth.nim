@@ -65,9 +65,8 @@ proc saveSettings*(value: Settings) =
   let file = settingsPath()
   let dir = parentDir(file)
   createDir(dir)
-  let mode = 0o700
   when not defined(windows):
-    discard # chmod dir best-effort via temp write
+    discard execShellCmd("chmod 700 " & dir)
   var j = %*{"name": value.name, "vaults": %[]}
   for v in value.vaults:
     j["vaults"].add(%*{"id": v.id, "name": v.name})

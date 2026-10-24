@@ -94,25 +94,6 @@ References: op://Vault/Item/field or grim://vault/secret[/value]
 Full documentation: USAGE.md in the grim-agent repository.
 """).strip(leading = true)
 
-proc parseFlagValue(args: var seq[string], i: var int, key: string): string =
-  let arg = args[i]
-  if arg.startsWith(key & "="):
-    return arg[(key.len + 1) .. ^1]
-  if arg == key and i + 1 < args.len:
-    inc i
-    return args[i]
-  raise newException(ValueError, "Missing value for " & key)
-
-proc takeBool(args: var seq[string], i: var int, key: string): bool =
-  if args[i] == key:
-    true
-  elif args[i].startsWith(key & "=true"):
-    true
-  elif args[i].startsWith(key & "=false"):
-    false
-  else:
-    false
-
 proc runCli*(args: seq[string]) =
   if args.len == 0:
     raise fail("No command specified")
