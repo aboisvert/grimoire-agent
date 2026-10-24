@@ -18,7 +18,7 @@ These flags may appear **before** the subcommand.
 |------|-------------|
 | `--desktop` | Authenticate with the desktop app (owner GPG / interactive approvals). Clears service-account env vars for this process. Use when you need vaults or items outside the automation service account. |
 | `--version`, `-v` | Print `grim-agent` version and exit. |
-| `--help`, `-h` | Print a one-line description and exit. |
+| `--help`, `-h` | Print usage summary (commands, flags, examples) and exit. |
 
 If no subcommand is given, the CLI exits with an error.
 

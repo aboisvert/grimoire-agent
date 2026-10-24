@@ -1,5 +1,4 @@
 type Failure* = object of CatchableError
-  message*: string
 
 proc fail*(message: string): ref Failure =
   newException(Failure, message)

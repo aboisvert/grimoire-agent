@@ -18,10 +18,6 @@ proc main() =
   let args = normalizeTrailingArguments(raw)
   try:
     runCli(args)
-  except Failure as e:
-    grimAgentError(e.message)
-  except ValueError as e:
-    grimAgentError(e.msg)
   except CatchableError as e:
     grimAgentError(e.msg)
 

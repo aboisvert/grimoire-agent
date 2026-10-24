@@ -14,6 +14,86 @@ import arguments
 proc printJson*(node: JsonNode) =
   echo pretty(node, indent = 2)
 
+proc printHelp*() =
+  echo ("""
+grim-agent """ & grimAgentVersion & """ — find, create, and use secrets without exposing them by default
+
+Works with grimoire's grim binary (1Password-compatible op surface). Prefer grim:// or op://
+references and JSON output; use read or env resolve only when you need plaintext.
+
+Usage:
+  grim-agent [global flags] <command> [arguments]
+
+Global flags:
+  --desktop       Use desktop app auth (clears service-account env for this process)
+  --version, -v   Print version and exit
+  --help, -h      Show this help and exit
+
+Environment:
+  GRIM_BIN                  Path to grim (default: grim on PATH)
+  OP_SERVICE_ACCOUNT_TOKEN  Service-account token (unless --desktop)
+  OP_ACCOUNT                Optional account shorthand for grim
+
+Authentication (all commands except doctor):
+  --desktop → env token → saved Keychain service account → grim default auth
+
+Commands:
+  find QUERY [QUERY ...] [--vault VAULT] [--account ACCOUNT]
+      Search items by title; JSON matches/suggestions (no secret values).
+
+  inventory [--vault VAULT] [--account ACCOUNT]
+      List items and field metadata as JSON.
+
+  audit [--vault VAULT] [--account ACCOUNT]
+      Hygiene report (duplicates, stale logins, URLs to review) as JSON.
+
+  read REFERENCE
+      Resolve grim:// or op:// to stdout (plaintext — prefer run / env run).
+
+  run --env NAME=REF [--env ...] -- COMMAND [ARGS ...]
+      Set env vars to references and run a child via grim run.
+
+  env write FILE NAME=REF [NAME=REF ...]
+      Write a secret-reference template file.
+
+  env resolve FILE (--output PATH | --in-place)
+      Resolve a template to a plaintext .env file.
+
+  env run FILE -- COMMAND [ARGS ...]
+      Run a command with an env template via grim.
+
+  create api-credential --title TITLE --vault VAULT (--clipboard | --stdin)
+      [--account ACCOUNT] [--url URL] [--notes NOTES]
+      Store a new API credential (secret from clipboard or stdin only).
+
+  password ITEM --vault VAULT (--clipboard | --stdin) [--account ACCOUNT]
+      [--apply] [--repair-imported-fields]
+      Check or update a login password (--apply writes; default is dry-run).
+
+  service-account setup --save-vault VAULT [--name NAME] [--vault VAULT]
+      [--create-vault] [--write] [--expires-in DURATION] [--account ACCOUNT]
+      Create automation account and save token (macOS Keychain).
+
+  service-account connect (--clipboard | --stdin) [--name NAME]
+      Save an existing ops_… token.
+
+  service-account status | recover [--name NAME] | forget
+      Inspect, reconcile, or remove local service-account config.
+
+  doctor
+      Safe diagnostics JSON (does not load credentials).
+
+Examples:
+  grim-agent find openai anthropic --vault Automation
+  grim-agent run --env "OPENAI_API_KEY=op://Automation/OpenAI API Key/credential" -- bun run dev
+  grim-agent env write .env.tpl "API_KEY=op://Automation/My Key/credential"
+  grim-agent service-account status
+  grim-agent doctor
+
+References: op://Vault/Item/field or grim://vault/secret[/value]
+Full documentation: USAGE.md in the grim-agent repository.
+""").strip(leading = true)
+
 proc parseFlagValue(args: var seq[string], i: var int, key: string): string =
   let arg = args[i]
   if arg.startsWith(key & "="):
@@ -47,7 +127,7 @@ proc runCli*(args: seq[string]) =
       echo grimAgentVersion
       return
     elif rest[i] == "--help" or rest[i] == "-h":
-      echo "grim-agent — find, create, and use secrets without exposing them by default"
+      printHelp()
       return
     else:
       filtered.add rest[i]
