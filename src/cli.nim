@@ -205,6 +205,9 @@ proc runCli*(args: seq[string]) =
       elif rest[i] == "--env":
         inc i
         envs.add parseAssignment(rest[i])
+      elif rest[i].startsWith(trailingArgumentPrefix):
+        cmdStart = i
+        break
       else:
         raise fail("Unknown argument: " & rest[i])
       inc i
@@ -245,16 +248,24 @@ proc runCli*(args: seq[string]) =
         raise fail("Choose exactly one of --output or --in-place")
       resolveFile(file, if output.len > 0: output else: file)
     of "run":
+      var file = ""
       var cmdStart = -1
       i = 2
       while i < rest.len:
         if rest[i] == "--":
           cmdStart = i + 1
           break
+        elif rest[i].startsWith(trailingArgumentPrefix):
+          cmdStart = i
+          break
+        elif file.len == 0:
+          file = rest[i]
+        else:
+          raise fail("Unexpected argument: " & rest[i])
         inc i
-      if cmdStart < 0:
+      if cmdStart < 0 or file.len == 0 or cmdStart >= rest.len:
         raise fail("Usage: grim-agent env run FILE -- COMMAND...")
-      let code = runEnvFile(rest[2], decodeTrailingArguments(rest[cmdStart .. ^1]))
+      let code = runEnvFile(file, decodeTrailingArguments(rest[cmdStart .. ^1]))
       quit(code)
     else:
       raise fail("Unknown env subcommand: " & rest[1])
