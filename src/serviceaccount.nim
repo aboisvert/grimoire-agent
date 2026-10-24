@@ -1,4 +1,4 @@
-import std/[strutils, json, options, re, algorithm, sequtils, sets]
+import std/[strutils, json, options, re, sequtils, sets]
 import failure
 import grim
 import auth

@@ -1,4 +1,4 @@
-import std/[json, strutils]
+import std/json
 
 proc parseJsonDocuments*(input: string): seq[JsonNode] =
   var start = -1

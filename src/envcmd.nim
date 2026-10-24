@@ -1,4 +1,4 @@
-import std/[strutils, re, tables, options, os, json, streams, times, osproc]
+import std/[strutils, tables, os, json, times]
 import failure
 import grim
 
@@ -122,12 +122,11 @@ proc readMany*(references: seq[string]): seq[string] =
   let values = parseJson(runOut)
   if values.kind != JArray or values.len != references.len:
     raise fail("grim returned an invalid secret batch")
-  var result: seq[string] = @[]
+  result = @[]
   for v in values:
     if v.kind != JString:
       raise fail("grim returned an invalid secret batch")
     result.add v.getStr()
-  result
 
 proc runAssignments*(assignments: seq[Assignment], command: seq[string]): int =
   var extra = initTable[string, string]()

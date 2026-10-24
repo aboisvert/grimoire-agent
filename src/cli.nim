@@ -1,4 +1,4 @@
-import std/[strutils, tables, options, json, os]
+import std/[strutils, options, json]
 import failure
 import version
 import auth

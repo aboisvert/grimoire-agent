@@ -1,4 +1,4 @@
-import std/[strutils, json, os, options]
+import std/[json, os, options]
 import version
 import auth
 import grim

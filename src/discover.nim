@@ -1,4 +1,4 @@
-import std/[strutils, algorithm, json, options, tables, re, times, hashes, sets, sequtils]
+import std/[strutils, algorithm, json, options, tables, times, hashes, sets]
 import failure
 import grim
 import jsondocs

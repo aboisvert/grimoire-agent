@@ -1,7 +1,6 @@
-import std/[strutils, json, options, tables, re]
+import std/[strutils, json, options, re]
 import failure
 import grim
-import auth
 
 type Destination* = object
   title*: string

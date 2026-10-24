@@ -1,4 +1,4 @@
-import std/[strutils, json, options, re]
+import std/[strutils, json, options]
 import failure
 import grim
 
